@@ -56,3 +56,9 @@ backend/uploads/tmp/*
 
 # PowerShell deploy artifacts
 deploy*.ps1
+
+# Backup files
+*.bak*
+*.bak2
+*.bak3
+*.bak-cloudinary
