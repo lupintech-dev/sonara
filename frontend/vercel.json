@@ -1,6 +1,17 @@
 ﻿{
   "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    {
+      "source": "/api/:path*",
+      "destination": "https://sonara-g3cu.onrender.com/api/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://sonara-g3cu.onrender.com/uploads/:path*"
+    },
+    {
+      "source": "/((?!api/|uploads/).*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
