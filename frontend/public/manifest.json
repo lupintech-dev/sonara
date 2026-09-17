@@ -2,7 +2,7 @@
   "name": "Sonara",
   "short_name": "Sonara",
   "description": "Free, unlimited music from independent artists on Audius and Jamendo.",
-  "start_url": "/",
+  "start_url": "/?app=1",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

@@ -69,7 +69,7 @@ export default function WelcomePage() {
           <img src="/sonara-logo.png" alt="Sonara Logo" className="nav-logo-img" />
           <span className="nav-logo-text">Sonara</span>
         </div>
-        <button className="nav-cta" onClick={() => navigate('/')}>
+        <button className="nav-cta" onClick={() => (function(){ try { localStorage.setItem('sonara_seen_welcome','1'); } catch {} navigate('/'); })()}>
           Open web app
         </button>
       </nav>
@@ -94,7 +94,7 @@ export default function WelcomePage() {
           </p>
 
           <div className="hero-actions stagger-left">
-            <button className="btn-primary" onClick={() => navigate('/')}>
+            <button className="btn-primary" onClick={() => (function(){ try { localStorage.setItem('sonara_seen_welcome','1'); } catch {} navigate('/'); })()}>
               <Play size={20} fill="currentColor" />
               Continue in browser
             </button>
@@ -227,3 +227,4 @@ export default function WelcomePage() {
     </div>
   );
 }
+

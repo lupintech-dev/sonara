@@ -1,4 +1,4 @@
-// frontend/src/App.jsx
+﻿// frontend/src/App.jsx
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
@@ -55,6 +55,25 @@ function Shell() {
   const refreshDownloads = useDownloadStore(s => s.refresh);
 
   useEffect(() => { refreshDownloads(); }, [refreshDownloads]);
+
+  // First-time visitors (Google, direct URL, no login) → show /welcome
+  // Skipped when: PWA installed (start_url has ?app=1), or user already
+  // dismissed welcome, or user has a token (returning user).
+  useEffect(() => {
+    if (location.pathname !== '/') return;
+    const params = new URLSearchParams(location.search);
+    const isAppLaunch = params.get('app') === '1';
+    let hasSeenWelcome = false;
+    let hasToken = false;
+    try {
+      hasSeenWelcome = localStorage.getItem('sonara_seen_welcome') === '1';
+      hasToken = !!localStorage.getItem('sonara_token');
+    } catch { /* SSR-safe */ }
+    if (!isAppLaunch && !hasSeenWelcome && !hasToken) {
+      navigate('/welcome', { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const handler = () => {
