@@ -28,24 +28,43 @@ export default function WelcomePage() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // PWA Install Logic
+  // PWA Install Logic — reads from global captured prompt
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
+    // Hydrate from anything already captured before this component mounted
+    if (window.__sonaraInstallPrompt) {
+      setDeferredPrompt(window.__sonaraInstallPrompt);
+    }
+    const handleAvailable = () => {
+      setDeferredPrompt(window.__sonaraInstallPrompt);
     };
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    const handleInstalled = () => {
+      setDeferredPrompt(null);
+      setInstallMessage('Sonara is installed. Look for the icon on your desktop or home screen.');
+      setTimeout(() => setInstallMessage(''), 5000);
+    };
+    window.addEventListener('sonara-install-available', handleAvailable);
+    window.addEventListener('sonara-installed', handleInstalled);
+    return () => {
+      window.removeEventListener('sonara-install-available', handleAvailable);
+      window.removeEventListener('sonara-installed', handleInstalled);
+    };
   }, []);
 
   const handleInstallClick = async (platform) => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
+    // Prefer the global prompt (always up-to-date), fall back to state
+    const prompt = window.__sonaraInstallPrompt || deferredPrompt;
+    if (prompt) {
+      prompt.prompt();
+      const { outcome } = await prompt.userChoice;
       if (outcome === 'accepted') {
-        console.log('User accepted the install prompt');
+        setInstallMessage('Installing Sonara… check your desktop or home screen.');
+        setTimeout(() => setInstallMessage(''), 5000);
       }
+      window.__sonaraInstallPrompt = null;
       setDeferredPrompt(null);
+    } else if (window.__sonaraIsInstalled) {
+      setInstallMessage('Sonara is already installed. Look for the green icon on your desktop or home screen.');
+      setTimeout(() => setInstallMessage(''), 6000);
     } else {
       // Fallback instructions for unsupported browsers (Safari, Firefox)
       if (platform === 'android') {
@@ -227,4 +246,5 @@ export default function WelcomePage() {
     </div>
   );
 }
+
 
