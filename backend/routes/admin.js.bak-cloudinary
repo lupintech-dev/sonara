@@ -1,4 +1,4 @@
-﻿// backend/routes/admin.js
+// backend/routes/admin.js
 import { Router } from 'express';
 import multer from 'multer';
 import path from 'node:path';
@@ -7,22 +7,38 @@ import { fileURLToPath } from 'node:url';
 import AdmZip from 'adm-zip';
 import { query, queryOne, execute } from '../db/turso.js';
 import { requireAdmin } from '../middleware/auth.js';
-import { uploadBuffer, deleteAsset, publicIdFromUrl } from '../services/cloudUpload.js';
 import {
   parseEntryName, ensureArtist, bulkCreateArtists,
   readAudioMetadata, splitArtistTitle, stripArtistPrefixFromTitle,
 } from '../services/adminUpload.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TEMP_DIR = path.join(__dirname, '..', 'uploads', 'tmp');
+const AUDIO_DIR = path.join(__dirname, '..', 'uploads', 'audio');
+const IMAGE_DIR = path.join(__dirname, '..', 'uploads', 'images');
+const TEMP_DIR  = path.join(__dirname, '..', 'uploads', 'tmp');
+fs.mkdirSync(AUDIO_DIR, { recursive: true });
+fs.mkdirSync(IMAGE_DIR, { recursive: true });
 fs.mkdirSync(TEMP_DIR, { recursive: true });
 
 const ALLOWED_AUDIO = ['.mp3', '.m4a', '.wav', '.ogg', '.flac', '.aac', '.opus', '.webm'];
 const ALLOWED_IMAGE = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
 
-// Memory storage for single uploads (uploads to Cloudinary)
+const audioImageStorage = multer.diskStorage({
+  destination: (_req, file, cb) => {
+    if (file.fieldname === 'audio') cb(null, AUDIO_DIR);
+    else cb(null, IMAGE_DIR);
+  },
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const safe = file.fieldname === 'audio'
+      ? (ALLOWED_AUDIO.includes(ext) ? ext : '.mp3')
+      : (ALLOWED_IMAGE.includes(ext) ? ext : '.jpg');
+    cb(null, `track-${Date.now()}-${Math.random().toString(36).slice(2, 8)}${safe}`);
+  },
+});
+
 const uploadSingle = multer({
-  storage: multer.memoryStorage(),
+  storage: audioImageStorage,
   limits: { fileSize: 100 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (file.fieldname === 'audio' && !file.mimetype.startsWith('audio/')) {
@@ -35,7 +51,6 @@ const uploadSingle = multer({
   },
 }).fields([{ name: 'audio', maxCount: 1 }, { name: 'image', maxCount: 1 }]);
 
-// ZIP still uses disk (avoids 500MB in RAM), file deleted after processing
 const uploadZip = multer({
   storage: multer.diskStorage({
     destination: (_req, _file, cb) => cb(null, TEMP_DIR),
@@ -48,7 +63,7 @@ const uploadZip = multer({
   },
 }).single('zip');
 
-async function serializeTrack(row) {
+function serializeTrack(row) {
   return {
     id: `local:${row.id}`,
     dbId: row.id,
@@ -86,53 +101,33 @@ const TRACK_SELECT = `
 `;
 
 async function createTrackRow({ title, artistId, albumId, duration, audioPath, imagePath }) {
-  const r = await execute(`
+  const r = (await execute(`
     INSERT INTO tracks (title, artist_id, album_id, duration, audio_path, image_path, source)
     VALUES (?, ?, ?, ?, ?, ?, 'local')
-  `, [title, artistId, albumId || null, duration || null, audioPath, imagePath || null]);
+  `, [title, artistId, albumId || null, duration || null, audioPath, imagePath || null]));
   const trackId = Number(r.lastInsertRowid);
-  await execute('UPDATE tracks SET source_id = ? WHERE id = ?', [String(trackId), trackId]);
+  (await execute('UPDATE tracks SET source_id = ? WHERE id = ?', [String(trackId), trackId]));
   return trackId;
 }
 
 async function getOrCreateAlbum(name, artistId, coverPath) {
   if (!name?.trim()) return null;
-  const existing = await queryOne(`SELECT id FROM albums WHERE artist_id = ? AND LOWER(name) = LOWER(?) LIMIT 1`, [artistId, name.trim()]);
+  const existing = (await queryOne(`SELECT id FROM albums WHERE artist_id = ? AND LOWER(name) = LOWER(?) LIMIT 1`, [artistId, name.trim()]));
   if (existing) {
     if (coverPath) {
-      await execute(`UPDATE albums SET cover_path = COALESCE(cover_path, ?) WHERE id = ?`, [coverPath, existing.id]);
+      (await execute(`UPDATE albums SET cover_path = COALESCE(cover_path, ?) WHERE id = ?`, [coverPath, existing.id]));
     }
     return existing.id;
   }
-  const r = await execute(`INSERT INTO albums (name, artist_id, cover_path) VALUES (?, ?, ?)`, [name.trim(), artistId, coverPath || null]);
+  const r = (await execute(`INSERT INTO albums (name, artist_id, cover_path) VALUES (?, ?, ?)`, [name.trim(), artistId, coverPath || null]));
   return Number(r.lastInsertRowid);
 }
 
-/** Upload a cover buffer to Cloudinary and return the URL. */
-async function saveCoverBuffer(buffer, ext) {
+function saveCoverBuffer(buffer, ext) {
   const safeExt = ['.jpg', '.png', '.webp', '.gif'].includes(ext) ? ext : '.jpg';
-  try {
-    const result = await uploadBuffer(buffer, {
-      folder: 'sonara/covers',
-      resourceType: 'image',
-      format: safeExt.slice(1),
-    });
-    return result.url;
-  } catch (err) {
-    console.error('[admin upload] cover upload failed:', err.message);
-    return null;
-  }
-}
-
-/** Upload an audio buffer to Cloudinary and return the URL. */
-async function saveAudioBuffer(buffer, ext) {
-  const safeExt = ALLOWED_AUDIO.includes(ext) ? ext : '.mp3';
-  const result = await uploadBuffer(buffer, {
-    folder: 'sonara/audio',
-    resourceType: 'video', // Cloudinary treats audio as video resource type
-    format: safeExt.slice(1),
-  });
-  return result.url;
+  const filename = `cover-${Date.now()}-${Math.random().toString(36).slice(2, 8)}${safeExt}`;
+  fs.writeFileSync(path.join(IMAGE_DIR, filename), buffer);
+  return `/uploads/images/${filename}`;
 }
 
 const router = Router();
@@ -160,19 +155,19 @@ router.get('/users', requireAdmin, async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit || '50', 10), 200);
 
   const rows = q
-    ? await query(`
+    ? (await query(`
         SELECT id, username, email, display_name, avatar_path,
                is_verified_artist, is_admin, is_managed_by_sonara, created_at
         FROM users
         WHERE username LIKE ? OR display_name LIKE ? OR email LIKE ?
         ORDER BY created_at DESC LIMIT ?
-      `, [`%${q}%`, `%${q}%`, `%${q}%`, limit])
-    : await query(`
+      `, [`%${q}%`, `%${q}%`, `%${q}%`, limit]))
+    : (await query(`
         SELECT id, username, email, display_name, avatar_path,
                is_verified_artist, is_admin, is_managed_by_sonara, created_at
         FROM users
         ORDER BY created_at DESC LIMIT ?
-      `, [limit]);
+      `, [limit]));
 
   res.json({
     users: rows.map(u => ({
@@ -194,7 +189,7 @@ router.post('/users/:id/verify-artist', requireAdmin, async (req, res) => {
   if (!(await queryOne('SELECT id FROM users WHERE id = ?', [id]))) {
     return res.status(404).json({ error: 'User not found' });
   }
-  await execute('UPDATE users SET is_verified_artist = 1 WHERE id = ?', [id]);
+  (await execute('UPDATE users SET is_verified_artist = 1 WHERE id = ?', [id]));
   res.json({ ok: true });
 });
 
@@ -203,7 +198,7 @@ router.post('/users/:id/unverify-artist', requireAdmin, async (req, res) => {
   if (!(await queryOne('SELECT id FROM users WHERE id = ?', [id]))) {
     return res.status(404).json({ error: 'User not found' });
   }
-  await execute('UPDATE users SET is_verified_artist = 0 WHERE id = ?', [id]);
+  (await execute('UPDATE users SET is_verified_artist = 0 WHERE id = ?', [id]));
   res.json({ ok: true });
 });
 
@@ -212,7 +207,7 @@ router.post('/users/:id/grant-admin', requireAdmin, async (req, res) => {
   if (!(await queryOne('SELECT id FROM users WHERE id = ?', [id]))) {
     return res.status(404).json({ error: 'User not found' });
   }
-  await execute('UPDATE users SET is_admin = 1 WHERE id = ?', [id]);
+  (await execute('UPDATE users SET is_admin = 1 WHERE id = ?', [id]));
   res.json({ ok: true });
 });
 
@@ -222,7 +217,7 @@ router.post('/users/:id/revoke-admin', requireAdmin, async (req, res) => {
   if (!(await queryOne('SELECT id FROM users WHERE id = ?', [id]))) {
     return res.status(404).json({ error: 'User not found' });
   }
-  await execute('UPDATE users SET is_admin = 0 WHERE id = ?', [id]);
+  (await execute('UPDATE users SET is_admin = 0 WHERE id = ?', [id]));
   res.json({ ok: true });
 });
 
@@ -232,7 +227,7 @@ router.delete('/users/:id', requireAdmin, async (req, res) => {
     return res.status(400).json({ error: "You can't delete your own account" });
   }
 
-  const user = await queryOne('SELECT id, username, is_managed_by_sonara FROM users WHERE id = ?', [id]);
+  const user = (await queryOne('SELECT id, username, is_managed_by_sonara FROM users WHERE id = ?', [id]));
   if (!user) return res.status(404).json({ error: 'User not found' });
 
   const force = req.query.force === '1';
@@ -242,35 +237,25 @@ router.delete('/users/:id', requireAdmin, async (req, res) => {
     });
   }
 
-  // Delete cloud assets (best-effort)
-  const tracks = await query('SELECT id, audio_path, image_path FROM tracks WHERE artist_id = ?', [id]);
+  const tracks = (await query('SELECT id, audio_path, image_path FROM tracks WHERE artist_id = ?', [id]));
   for (const t of tracks) {
-    if (t.audio_path) {
-      const info = publicIdFromUrl(t.audio_path);
-      if (info) await deleteAsset(info.publicId, info.resourceType);
-    }
-    if (t.image_path) {
-      const info = publicIdFromUrl(t.image_path);
-      if (info) await deleteAsset(info.publicId, info.resourceType);
-    }
+    if (t.audio_path) fs.unlink(path.join(__dirname, '..', t.audio_path), () => {});
+    if (t.image_path) fs.unlink(path.join(__dirname, '..', t.image_path), () => {});
   }
 
-  const albums = await query('SELECT id, cover_path FROM albums WHERE artist_id = ?', [id]);
+  const albums = (await query('SELECT id, cover_path FROM albums WHERE artist_id = ?', [id]));
   for (const a of albums) {
-    if (a.cover_path) {
-      const info = publicIdFromUrl(a.cover_path);
-      if (info) await deleteAsset(info.publicId, info.resourceType);
-    }
+    if (a.cover_path) fs.unlink(path.join(__dirname, '..', a.cover_path), () => {});
   }
 
   const ownerKey = `user:${id}`;
-  await execute('DELETE FROM tracks WHERE artist_id = ?', [id]);
-  await execute('DELETE FROM albums WHERE artist_id = ?', [id]);
-  await execute('DELETE FROM playlists WHERE owner_id = ?', [ownerKey]);
-  await execute('DELETE FROM favorites WHERE user_id = ?', [ownerKey]);
-  await execute('DELETE FROM listening_history WHERE user_id = ?', [ownerKey]);
-  await execute('DELETE FROM follows WHERE followee_id = ? OR follower_id = ?', [id, ownerKey]);
-  await execute('DELETE FROM users WHERE id = ?', [id]);
+  (await execute('DELETE FROM tracks WHERE artist_id = ?', [id]));
+  (await execute('DELETE FROM albums WHERE artist_id = ?', [id]));
+  (await execute('DELETE FROM playlists WHERE owner_id = ?', [ownerKey]));
+  (await execute('DELETE FROM favorites WHERE user_id = ?', [ownerKey]));
+  (await execute('DELETE FROM listening_history WHERE user_id = ?', [ownerKey]));
+  (await execute('DELETE FROM follows WHERE followee_id = ? OR follower_id = ?', [id, ownerKey]));
+  (await execute('DELETE FROM users WHERE id = ?', [id]));
 
   res.json({
     ok: true,
@@ -291,34 +276,30 @@ router.post('/upload/track', requireAdmin, uploadSingle, async (req, res) => {
   if (!audioFile) return res.status(400).json({ error: 'Audio file required' });
 
   const { title, artistName, albumName, duration } = req.body || {};
-  if (!title?.trim()) return res.status(400).json({ error: 'Title is required' });
-  if (!artistName?.trim()) return res.status(400).json({ error: 'Artist name is required' });
-
-  const artistId = await ensureArtist(artistName.trim());
-  if (!artistId) return res.status(400).json({ error: 'Could not resolve artist' });
-
-  // Upload audio to Cloudinary
-  const audioExt = (audioFile.originalname.match(/\.[^.]+$/)?.[0] || '.mp3').toLowerCase();
-  let audioUrl;
-  try {
-    audioUrl = await saveAudioBuffer(audioFile.buffer, audioExt);
-  } catch (err) {
-    console.error('[admin upload] audio failed:', err.message);
-    return res.status(500).json({ error: 'Audio upload failed' });
+  if (!title?.trim()) {
+    fs.unlink(audioFile.path, () => {});
+    if (imageFile) fs.unlink(imageFile.path, () => {});
+    return res.status(400).json({ error: 'Title is required' });
+  }
+  if (!artistName?.trim()) {
+    fs.unlink(audioFile.path, () => {});
+    if (imageFile) fs.unlink(imageFile.path, () => {});
+    return res.status(400).json({ error: 'Artist name is required' });
   }
 
-  // Cover: prefer uploaded image, fall back to embedded metadata cover
-  let imageUrl = null;
-  let embeddedDuration = null;
+  const artistId = ensureArtist(artistName.trim());
+  if (!artistId) return res.status(400).json({ error: 'Could not resolve artist' });
 
-  if (imageFile) {
-    const imgExt = (imageFile.originalname.match(/\.[^.]+$/)?.[0] || '.jpg').toLowerCase();
-    imageUrl = await saveCoverBuffer(imageFile.buffer, imgExt);
-  } else {
+  const audioPath = `/uploads/audio/${audioFile.filename}`;
+
+  let imagePath = imageFile ? `/uploads/images/${imageFile.filename}` : null;
+  let embeddedDuration = null;
+  if (!imagePath) {
     try {
-      const meta = await readAudioMetadata(audioFile.buffer, audioFile.originalname);
+      const buffer = fs.readFileSync(audioFile.path);
+      const meta = await readAudioMetadata(buffer, audioFile.originalname);
       if (meta?.cover?.data?.length) {
-        imageUrl = await saveCoverBuffer(meta.cover.data, meta.cover.ext);
+        imagePath = saveCoverBuffer(meta.cover.data, meta.cover.ext);
       }
       if (meta?.duration) embeddedDuration = meta.duration;
     } catch (err) {
@@ -326,21 +307,23 @@ router.post('/upload/track', requireAdmin, uploadSingle, async (req, res) => {
     }
   }
 
+  // NEW: strip the artist prefix from the title if present
   const cleanTitle = stripArtistPrefixFromTitle(title.trim(), artistName.trim()) || title.trim();
-  const dur = duration ? parseInt(duration, 10) : embeddedDuration;
-  const albumId = albumName?.trim() ? await getOrCreateAlbum(albumName.trim(), artistId, imageUrl) : null;
 
-  const trackId = await createTrackRow({
+  const dur = duration ? parseInt(duration, 10) : embeddedDuration;
+  const albumId = albumName?.trim() ? getOrCreateAlbum(albumName.trim(), artistId, imagePath) : null;
+
+  const trackId = createTrackRow({
     title: cleanTitle,
     artistId,
     albumId,
     duration: dur,
-    audioPath: audioUrl,
-    imagePath: imageUrl,
+    audioPath,
+    imagePath,
   });
 
-  const row = await queryOne(`${TRACK_SELECT} WHERE t.id = ?`, [trackId]);
-  res.status(201).json({ track: await serializeTrack(row) });
+  const row = (await queryOne(`${TRACK_SELECT} WHERE t.id = ?`, [trackId]));
+  res.status(201).json({ track: serializeTrack(row) });
 });
 
 router.post('/upload/zip', requireAdmin, async (req, res, next) => {
@@ -393,7 +376,9 @@ router.post('/upload/zip', requireAdmin, async (req, res, next) => {
       let meta = null;
       try {
         meta = await readAudioMetadata(buffer, entry.entryName);
-      } catch (err) { /* non-fatal */ }
+      } catch (err) {
+        // Non-fatal
+      }
 
       let finalTitle = parsed.title || null;
       let finalArtist = parsed.artist || null;
@@ -414,6 +399,7 @@ router.post('/upload/zip', requireAdmin, async (req, res, next) => {
         continue;
       }
 
+      // Strip whitespace-dash form (e.g. "Asake - Title")
       if (finalTitle && finalArtist && finalTitle !== finalArtist) {
         const reSplit = splitArtistTitle(finalTitle);
         if (reSplit.artist && reSplit.artist.toLowerCase() === finalArtist.toLowerCase() && reSplit.title) {
@@ -422,28 +408,25 @@ router.post('/upload/zip', requireAdmin, async (req, res, next) => {
         }
       }
 
+      // NEW: strip any other separator form (e.g. "6uff-The-Truth" → "The-Truth")
       finalTitle = stripArtistPrefixFromTitle(finalTitle, finalArtist) || finalTitle;
 
-      // Upload audio
+      // Save audio
       const ext = path.extname(entry.entryName).toLowerCase() || '.mp3';
       const safeExt = ALLOWED_AUDIO.includes(ext) ? ext : '.mp3';
-      let audioUrl;
-      try {
-        audioUrl = await saveAudioBuffer(buffer, safeExt);
-      } catch (err) {
-        results.errors.push({ name: entry.entryName, error: 'audio upload failed' });
-        continue;
-      }
+      const filename = `track-${Date.now()}-${Math.random().toString(36).slice(2, 8)}${safeExt}`;
+      fs.writeFileSync(path.join(AUDIO_DIR, filename), buffer);
+      const audioPath = `/uploads/audio/${filename}`;
 
-      // Upload cover (from metadata)
-      let imageUrl = null;
+      // Save cover
+      let imagePath = null;
       if (meta?.cover?.data?.length) {
-        imageUrl = await saveCoverBuffer(meta.cover.data, meta.cover.ext);
-        if (imageUrl) results.coversExtracted += 1;
+        imagePath = saveCoverBuffer(meta.cover.data, meta.cover.ext);
+        results.coversExtracted += 1;
       }
 
-      const artistId = await ensureArtist(finalArtist);
-      const albumId = finalAlbum ? await getOrCreateAlbum(finalAlbum, artistId, imageUrl) : null;
+      const artistId = ensureArtist(finalArtist);
+      const albumId = finalAlbum ? getOrCreateAlbum(finalAlbum, artistId, imagePath) : null;
 
       if (!knownArtistsBefore.has(artistId)) {
         results.artistsCreated += 1;
@@ -452,13 +435,13 @@ router.post('/upload/zip', requireAdmin, async (req, res, next) => {
         results.artistsReused += 1;
       }
 
-      const trackId = await createTrackRow({
+      const trackId = createTrackRow({
         title: finalTitle,
         artistId,
         albumId,
         duration: meta?.duration || null,
-        audioPath: audioUrl,
-        imagePath: imageUrl,
+        audioPath,
+        imagePath,
       });
 
       results.imported.push({
@@ -466,7 +449,7 @@ router.post('/upload/zip', requireAdmin, async (req, res, next) => {
         artist: finalArtist,
         title: finalTitle,
         album: finalAlbum,
-        hasCover: !!imageUrl,
+        hasCover: !!imagePath,
       });
     }
 
@@ -488,26 +471,26 @@ router.post('/upload/zip', requireAdmin, async (req, res, next) => {
   });
 });
 
-router.post('/artists/bulk', requireAdmin, async (req, res) => {
+router.post('/artists/bulk', requireAdmin, (req, res) => {
   const names = Array.isArray(req.body?.names) ? req.body.names : [];
   if (!names.length) return res.status(400).json({ error: 'names array required' });
 
-  const results = await bulkCreateArtists(names);
+  const results = bulkCreateArtists(names);
   res.json(results);
 });
 
-/* ---------- Messages ---------- */
+/* ---------- Artist → Admin messages ---------- */
 
 router.get('/messages', requireAdmin, async (req, res) => {
   const status = (req.query.status || 'open').toString();
-  const rows = await query(`
+  const rows = (await query(`
     SELECT m.*, u.username, u.display_name, u.avatar_path,
       (SELECT COUNT(*) FROM artist_message_replies r WHERE r.message_id = m.id) AS reply_count
     FROM artist_messages m
     JOIN users u ON u.id = m.artist_id
     WHERE m.status = ?
     ORDER BY m.created_at DESC
-  `, [status]);
+  `, [status]));
 
   res.json({
     messages: rows.map(m => ({
@@ -528,21 +511,21 @@ router.get('/messages', requireAdmin, async (req, res) => {
 
 router.get('/messages/:id', requireAdmin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const m = await queryOne(`
+  const m = (await queryOne(`
     SELECT m.*, u.username, u.display_name, u.avatar_path
     FROM artist_messages m
     JOIN users u ON u.id = m.artist_id
     WHERE m.id = ?
-  `, [id]);
+  `, [id]));
   if (!m) return res.status(404).json({ error: 'Message not found' });
 
-  const replies = await query(`
+  const replies = (await query(`
     SELECT r.*, u.username, u.display_name, u.avatar_path
     FROM artist_message_replies r
     LEFT JOIN users u ON u.id = r.author_id
     WHERE r.message_id = ?
     ORDER BY r.created_at ASC
-  `, [id]);
+  `, [id]));
 
   res.json({
     message: {
@@ -574,27 +557,27 @@ router.post('/messages/:id/reply', requireAdmin, async (req, res) => {
   const body = (req.body?.body || '').toString().trim();
   if (!body) return res.status(400).json({ error: 'Body required' });
 
-  const m = await queryOne('SELECT id FROM artist_messages WHERE id = ?', [id]);
+  const m = (await queryOne('SELECT id FROM artist_messages WHERE id = ?', [id]));
   if (!m) return res.status(404).json({ error: 'Message not found' });
 
-  await execute(`
+  (await execute(`
     INSERT INTO artist_message_replies (message_id, author_id, is_admin, body)
     VALUES (?, ?, 1, ?)
-  `, [id, req.user.id, body]);
+  `, [id, req.user.id, body]));
 
-  await execute(`UPDATE artist_messages SET updated_at = datetime('now') WHERE id = ?`, [id]);
+  (await execute(`UPDATE artist_messages SET updated_at = datetime('now') WHERE id = ?`, [id]));
   res.status(201).json({ ok: true });
 });
 
 router.post('/messages/:id/resolve', requireAdmin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  await execute(`UPDATE artist_messages SET status = 'resolved', updated_at = datetime('now') WHERE id = ?`, [id]);
+  (await execute(`UPDATE artist_messages SET status = 'resolved', updated_at = datetime('now') WHERE id = ?`, [id]));
   res.json({ ok: true });
 });
 
 router.post('/messages/:id/reopen', requireAdmin, async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  await execute(`UPDATE artist_messages SET status = 'open', updated_at = datetime('now') WHERE id = ?`, [id]);
+  (await execute(`UPDATE artist_messages SET status = 'open', updated_at = datetime('now') WHERE id = ?`, [id]));
   res.json({ ok: true });
 });
 
@@ -603,23 +586,23 @@ router.post('/messages/:id/reopen', requireAdmin, async (req, res) => {
 router.get('/activity', requireAdmin, async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit || '30', 10), 100);
 
-  const uploads = await query(`
+  const uploads = (await query(`
     SELECT t.id, t.title, t.created_at, u.username
     FROM tracks t
     LEFT JOIN users u ON u.id = t.artist_id
     WHERE t.source = 'local'
     ORDER BY t.created_at DESC LIMIT ?
-  `, [limit]);
+  `, [limit]));
 
-  const newUsers = await query(`
+  const newUsers = (await query(`
     SELECT id, username, display_name, created_at
     FROM users ORDER BY created_at DESC LIMIT ?
-  `, [limit]);
+  `, [limit]));
 
-  const newPlaylists = await query(`
+  const newPlaylists = (await query(`
     SELECT p.id, p.name, p.created_at, p.owner_id
     FROM playlists p ORDER BY p.created_at DESC LIMIT ?
-  `, [limit]);
+  `, [limit]));
 
   res.json({
     uploads: uploads.map(u => ({
