@@ -1,0 +1,33 @@
+/* frontend/src/components/common/FollowButton.css */
+.follow-btn {
+  position: relative;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.follow-btn.sm { font-size: 11px; padding: 5px 14px; }
+.follow-btn.md { font-size: 13px; padding: 8px 18px; }
+
+.follow-btn:hover { background: var(--surface-2); }
+
+.follow-btn.following {
+  background: var(--surface-3);
+  border-color: transparent;
+  color: var(--text-sub);
+}
+.follow-btn.following:hover {
+  background: rgba(255,107,107,0.12);
+  color: #ff8b8b;
+  border-color: rgba(255,107,107,0.4);
+}
+
+.follow-btn-unfollow { display: none; }
+.follow-btn.following:hover .follow-btn-label { display: none; }
+.follow-btn.following:hover .follow-btn-unfollow { display: inline; }

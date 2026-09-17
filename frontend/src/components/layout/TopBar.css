@@ -1,0 +1,105 @@
+/* frontend/src/components/layout/TopBar.css */
+.topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: 0 var(--s-6);
+  z-index: 20;
+  background: transparent;
+  pointer-events: none;
+}
+
+.topbar > * { pointer-events: auto; }
+
+.topbar-nav {
+  display: flex;
+  gap: var(--s-2);
+}
+
+.topbar-nav .btn-icon {
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.topbar-nav .btn-icon:hover {
+  background: rgba(0,0,0,0.75);
+  transform: scale(1.04);
+}
+
+:root[data-theme="light"] .topbar-nav .btn-icon {
+  background: rgba(255,255,255,0.85);
+  color: #000;
+}
+:root[data-theme="light"] .topbar-nav .btn-icon:hover {
+  background: #fff;
+}
+
+.topbar-spacer { flex: 1; }
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  background: rgba(0,0,0,0.55);
+  border: none;
+  color: #fff;
+  padding: 6px 14px 6px 6px;
+  border-radius: var(--r-pill);
+  font-weight: 600;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background var(--dur-fast) var(--ease);
+}
+.topbar-user:hover { background: rgba(0,0,0,0.75); }
+
+:root[data-theme="light"] .topbar-user {
+  background: rgba(255,255,255,0.85);
+  color: #000;
+}
+:root[data-theme="light"] .topbar-user:hover {
+  background: #fff;
+}
+
+.topbar-user-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-pill);
+  background: var(--surface-hi);
+  display: grid;
+  place-items: center;
+  color: var(--text-sub);
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 768px) {
+  .topbar {
+    padding: 0 var(--s-4);
+  }
+
+  /* Hide the back/forward nav — the phone handles back via OS gestures
+     and the hardware/software back button. */
+  .topbar-nav { display: none; }
+
+  /* The whole topbar collapses to just the floating avatar */
+  .topbar-spacer { flex: 1; }
+
+  .topbar-user span:not(.topbar-user-avatar) { display: none; }
+  .topbar-user {
+    padding: 4px;
+    background: transparent;
+    backdrop-filter: none;
+  }
+  :root[data-theme="light"] .topbar-user { background: transparent; }
+}

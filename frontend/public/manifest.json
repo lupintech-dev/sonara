@@ -1,0 +1,32 @@
+{
+  "name": "Sonara",
+  "short_name": "Sonara",
+  "description": "Free, unlimited music from independent artists on Audius and Jamendo.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#000000",
+  "theme_color": "#1ed760",
+  "categories": ["music", "entertainment"],
+  "icons": [
+    {
+      "src": "/sonara-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/sonara-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/sonara-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

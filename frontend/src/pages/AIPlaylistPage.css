@@ -1,0 +1,265 @@
+/* frontend/src/pages/AIPlaylistPage.css */
+.aip { padding-bottom: var(--s-10); max-width: 880px; }
+
+.aip-header {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-6) 0 var(--s-5);
+}
+.aip-badge {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #0f9e45);
+  color: #000;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(30,215,96,0.35);
+}
+.aip-header h1 {
+  font-size: 32px; font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+}
+.aip-header p {
+  font-size: 13px;
+  color: var(--text-sub);
+  margin: 0;
+}
+
+/* Prompt */
+.aip-prompt-wrap {
+  background: var(--surface-2);
+  border-radius: var(--r-lg);
+  padding: var(--s-4);
+  margin-bottom: var(--s-5);
+  border: 1px solid var(--border-soft);
+}
+.aip-prompt {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 15px;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: none;
+  padding: 0;
+  min-height: 60px;
+}
+.aip-prompt::placeholder { color: var(--text-muted); }
+
+.aip-prompt-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border-soft);
+}
+.aip-prompt-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.aip-prompt-actions {
+  display: flex;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.aip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.aip-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.aip-btn.primary {
+  background: var(--accent);
+  color: #000;
+}
+.aip-btn.primary:hover:not(:disabled) { background: var(--accent-hover); transform: scale(1.02); }
+
+.aip-btn.ghost {
+  background: var(--surface-3);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.aip-btn.ghost:hover:not(:disabled) { background: var(--surface-hi); }
+
+.aip-spin { animation: aip-spin 0.9s linear infinite; }
+@keyframes aip-spin { to { transform: rotate(360deg); } }
+
+/* Examples */
+.aip-examples { margin-bottom: var(--s-6); }
+.aip-examples h3 {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-sub);
+  margin: 0 0 var(--s-3);
+}
+.aip-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.aip-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.aip-chip:hover { background: var(--surface-3); border-color: var(--border); }
+.aip-chip svg { color: var(--accent); flex-shrink: 0; }
+
+/* Error */
+.aip-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,107,107,0.1);
+  border: 1px solid rgba(255,107,107,0.3);
+  color: #ff8b8b;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  font-size: 13px;
+  margin-bottom: var(--s-5);
+}
+
+/* Loading */
+.aip-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-10) var(--s-4);
+  text-align: center;
+}
+.aip-loading p {
+  color: var(--text-sub);
+  font-size: 14px;
+  margin: 0;
+}
+.aip-loading-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 44px;
+}
+.aip-loading-bars span {
+  width: 5px;
+  background: var(--accent);
+  border-radius: 3px;
+  animation: aip-bar 0.9s ease-in-out infinite;
+}
+.aip-loading-bars span:nth-child(1) { animation-delay: 0s; }
+.aip-loading-bars span:nth-child(2) { animation-delay: 0.12s; }
+.aip-loading-bars span:nth-child(3) { animation-delay: 0.24s; }
+.aip-loading-bars span:nth-child(4) { animation-delay: 0.36s; }
+.aip-loading-bars span:nth-child(5) { animation-delay: 0.48s; }
+@keyframes aip-bar {
+  0%, 100% { height: 12px; opacity: 0.5; }
+  50%      { height: 40px; opacity: 1; }
+}
+
+/* Result */
+.aip-result {
+  background: var(--surface-2);
+  border-radius: var(--r-lg);
+  padding: var(--s-5);
+  border: 1px solid var(--border-soft);
+}
+.aip-result-head { margin-bottom: var(--s-4); }
+.aip-result-meta { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.aip-result-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+.aip-result-meta h2 {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0;
+  word-break: break-word;
+}
+.aip-result-meta p {
+  font-size: 13px;
+  color: var(--text-sub);
+  margin: 0;
+  line-height: 1.5;
+}
+.aip-queries {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.aip-query {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  color: var(--text-sub);
+  font-weight: 600;
+}
+
+.aip-result-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) 0 var(--s-4);
+  flex-wrap: wrap;
+}
+.aip-play {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.aip-play:hover { transform: scale(1.06); background: var(--accent-hover); }
+
+.aip-tracklist {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+@media (max-width: 768px) {
+  .aip-header h1 { font-size: 26px; }
+  .aip-result-meta h2 { font-size: 22px; }
+  .aip-prompt-footer { flex-direction: column; align-items: stretch; gap: var(--s-3); }
+  .aip-prompt-actions { width: 100%; }
+  .aip-btn { flex: 1; justify-content: center; }
+  .aip-result-actions { gap: var(--s-2); }
+  .aip-play { width: 46px; height: 46px; }
+}

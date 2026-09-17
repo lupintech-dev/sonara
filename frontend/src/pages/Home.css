@@ -1,0 +1,291 @@
+/* frontend/src/pages/Home.css */
+.home {
+  position: relative;
+  padding-bottom: var(--s-8);
+}
+
+/* Everything except the glow sits above it */
+.home > *:not(.home-glow) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Full-bleed top glow ---------- */
+/* Bleeds past app-content's top + side padding, then fades smoothly down
+   through Discover so the color dissolves into the page. */
+.home-glow {
+  position: absolute;
+  top: calc(-1 * var(--s-4));        /* reach top of app-content */
+  left: calc(-1 * var(--s-6));       /* bleed past side padding */
+  right: calc(-1 * var(--s-6));
+  height: 900px;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 22%,
+    rgba(0,0,0,0.85) 38%,
+    rgba(0,0,0,0.6) 55%,
+    rgba(0,0,0,0.32) 72%,
+    rgba(0,0,0,0.12) 88%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 22%,
+    rgba(0,0,0,0.85) 38%,
+    rgba(0,0,0,0.6) 55%,
+    rgba(0,0,0,0.32) 72%,
+    rgba(0,0,0,0.12) 88%,
+    transparent 100%
+  );
+}
+
+.home-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 55% at 12% 0%, rgba(30,215,96,0.30) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 48% at 88% 0%, rgba(30,215,96,0.16) 0%, transparent 70%),
+    radial-gradient(ellipse 95% 75% at 50% -25%, rgba(30,215,96,0.12) 0%, transparent 78%);
+}
+
+/* Mood variants — the accent hue shifts subtly */
+.home.mood-morning .home-glow::before {
+  background:
+    radial-gradient(ellipse 60% 55% at 12% 0%, rgba(255,180,60,0.28) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 48% at 88% 0%, rgba(30,215,96,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 95% 75% at 50% -25%, rgba(30,215,96,0.10) 0%, transparent 78%);
+}
+.home.mood-afternoon .home-glow::before {
+  background:
+    radial-gradient(ellipse 60% 55% at 12% 0%, rgba(30,215,96,0.30) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 48% at 88% 0%, rgba(110,210,255,0.20) 0%, transparent 70%),
+    radial-gradient(ellipse 95% 75% at 50% -25%, rgba(30,215,96,0.12) 0%, transparent 78%);
+}
+.home.mood-evening .home-glow::before {
+  background:
+    radial-gradient(ellipse 60% 55% at 12% 0%, rgba(150,90,255,0.30) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 48% at 88% 0%, rgba(30,215,96,0.16) 0%, transparent 70%),
+    radial-gradient(ellipse 95% 75% at 50% -25%, rgba(30,215,96,0.10) 0%, transparent 78%);
+}
+.home.mood-night .home-glow::before {
+  background:
+    radial-gradient(ellipse 60% 55% at 12% 0%, rgba(90,90,255,0.30) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 48% at 88% 0%, rgba(30,215,96,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 95% 75% at 50% -25%, rgba(30,215,96,0.08) 0%, transparent 78%);
+}
+
+/* Light theme — softer, brighter */
+:root[data-theme="light"] .home-glow::before {
+  background:
+    radial-gradient(ellipse 60% 55% at 12% 0%, rgba(30,215,96,0.20) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 48% at 88% 0%, rgba(30,215,96,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 95% 75% at 50% -25%, rgba(30,215,96,0.08) 0%, transparent 78%);
+}
+:root[data-theme="light"] .home.mood-morning .home-glow::before {
+  background:
+    radial-gradient(ellipse 60% 55% at 12% 0%, rgba(255,180,60,0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 48% at 88% 0%, rgba(30,215,96,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 95% 75% at 50% -25%, rgba(30,215,96,0.06) 0%, transparent 78%);
+}
+:root[data-theme="light"] .home.mood-evening .home-glow::before {
+  background:
+    radial-gradient(ellipse 60% 55% at 12% 0%, rgba(150,90,255,0.16) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 48% at 88% 0%, rgba(30,215,96,0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 95% 75% at 50% -25%, rgba(30,215,96,0.06) 0%, transparent 78%);
+}
+:root[data-theme="light"] .home.mood-night .home-glow::before {
+  background:
+    radial-gradient(ellipse 60% 55% at 12% 0%, rgba(90,90,255,0.16) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 48% at 88% 0%, rgba(30,215,96,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 95% 75% at 50% -25%, rgba(30,215,96,0.05) 0%, transparent 78%);
+}
+
+/* ---------- Hero content — plain, no card ---------- */
+.home-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-8) 0 var(--s-6);
+  min-height: 140px;
+}
+
+.home-hero-content {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  min-width: 0;
+}
+
+.home-hero-badge {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--surface-2);
+  color: var(--accent);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 8px 22px rgba(30, 215, 96, 0.22);
+}
+:root[data-theme="light"] .home-hero-badge {
+  background: #fff;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.04),
+    0 8px 22px rgba(30, 215, 96, 0.28);
+}
+
+.home-hero-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+
+.home-hero-title {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  margin: 0;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.home-hero-sub {
+  color: var(--text-sub);
+  font-size: 14px;
+  margin: 0;
+  max-width: 520px;
+}
+
+/* Right side — floating decorative notes */
+.home-hero-decor {
+  position: relative;
+  width: 130px;
+  height: 70px;
+  flex-shrink: 0;
+  display: none;
+}
+
+.home-hero-note {
+  position: absolute;
+  color: var(--accent);
+  opacity: 0.6;
+  animation: hero-float 4s ease-in-out infinite;
+  will-change: transform;
+}
+
+.home-hero-note.note-1 { top: 12px; left: 8px;  animation-delay: 0s;    }
+.home-hero-note.note-2 { top: 38px; left: 44px; animation-delay: 0.6s;  opacity: 0.45; }
+.home-hero-note.note-3 { top: 6px;  left: 72px; animation-delay: 1.2s;  }
+.home-hero-note.note-4 { top: 44px; left: 104px;animation-delay: 1.8s;  opacity: 0.4; }
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0)    rotate(-6deg); }
+  50%      { transform: translateY(-8px) rotate(6deg);  }
+}
+
+:root[data-theme="light"] .home-hero-note { opacity: 0.7; }
+:root[data-theme="light"] .home-hero-note.note-2,
+:root[data-theme="light"] .home-hero-note.note-4 { opacity: 0.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-note { animation: none; }
+}
+
+/* ---------- Shelves ---------- */
+.home-shelf { margin-top: var(--s-8); }
+
+.shelf-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-bottom: var(--s-4);
+}
+.shelf-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.shelf-see-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: var(--text-sub);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 6px 8px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-family: inherit;
+  transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.shelf-see-all:hover { color: var(--text); background: var(--surface-2); }
+
+.chart-shelf-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--s-4);
+}
+.chart-shelf-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.track-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.shelf-empty {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: var(--s-4) 0;
+}
+.shelf-error { color: #ff6b6b; }
+
+@media (min-width: 600px) {
+  .home-hero-decor { display: block; }
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .chart-shelf-grid   { grid-template-columns: repeat(4, 1fr); }
+  .chart-shelf-grid-4 { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 900px) {
+  .chart-shelf-grid   { grid-template-columns: repeat(3, 1fr); }
+  .chart-shelf-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .home-glow {
+    top: calc(-1 * var(--s-2));
+    left: calc(-1 * var(--s-4));
+    right: calc(-1 * var(--s-4));
+    height: 700px;
+  }
+  .home-hero {
+    padding: var(--s-6) 0 var(--s-5);
+    min-height: 110px;
+  }
+  .home-hero-badge { width: 46px; height: 46px; }
+  .home-hero-badge svg { width: 20px; height: 20px; }
+  .home-hero-title { font-size: 24px; }
+  .home-hero-sub { font-size: 12px; }
+  .shelf-header h2 { font-size: 20px; }
+  .chart-shelf-grid,
+  .chart-shelf-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}

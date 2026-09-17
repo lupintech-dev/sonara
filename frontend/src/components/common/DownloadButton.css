@@ -1,0 +1,62 @@
+/* frontend/src/components/common/DownloadButton.css */
+.dl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--text-sub);
+  padding: 6px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+
+.dl-btn.sm { padding: 4px; }
+.dl-btn.md { padding: 6px; }
+.dl-btn.lg { padding: 8px; }
+
+.dl-btn:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.dl-btn.downloaded {
+  color: var(--accent);
+}
+.dl-btn.downloaded:hover:not(:disabled) {
+  color: #ff8b8b;
+  background: rgba(255,107,107,0.1);
+}
+
+.dl-btn.downloading {
+  color: var(--accent);
+  cursor: default;
+}
+
+.dl-btn.error {
+  color: #ff8b8b;
+}
+
+.dl-spin {
+  animation: dl-spin 0.9s linear infinite;
+}
+@keyframes dl-spin { to { transform: rotate(360deg); } }
+
+/* When the button is inside the NowPlaying overlay (dark context) */
+.np-footer .dl-btn {
+  color: rgba(255,255,255,0.85);
+}
+.np-footer .dl-btn:hover:not(:disabled) {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+.np-footer .dl-btn.downloaded {
+  color: var(--accent);
+}
+.np-footer .dl-btn.downloading {
+  color: var(--accent);
+}

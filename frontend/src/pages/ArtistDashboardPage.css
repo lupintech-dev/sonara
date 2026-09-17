@@ -1,0 +1,286 @@
+/* frontend/src/pages/ArtistDashboardPage.css */
+.adash { padding: var(--s-6) 0 var(--s-10); }
+
+.adash-loading {
+  display: flex; align-items: center; gap: var(--s-3);
+  color: var(--text-sub); font-size: 14px;
+  padding: var(--s-10) 0; justify-content: center;
+}
+.adash-spin { animation: adash-spin 0.9s linear infinite; }
+@keyframes adash-spin { to { transform: rotate(360deg); } }
+
+.adash-empty {
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  gap: var(--s-4);
+  padding: var(--s-10) var(--s-4);
+  min-height: 400px; justify-content: center;
+}
+.adash-empty-icon {
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: grid; place-items: center;
+  margin-bottom: var(--s-2);
+}
+.adash-empty h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 0; }
+.adash-empty p { color: var(--text-sub); font-size: 14px; margin: 0; max-width: 420px; }
+.adash-error { color: #ff8b8b; }
+
+.adash-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-6) 0 var(--s-5);
+  flex-wrap: wrap;
+}
+.adash-header-text { display: flex; flex-direction: column; gap: 4px; }
+.adash-label {
+  font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-sub); font-weight: 700;
+}
+.adash-header h1 { font-size: 34px; font-weight: 900; letter-spacing: -0.03em; margin: 0; }
+.adash-header-actions { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+
+.adash-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: #000;
+  border: none; font-weight: 700; font-size: 13px;
+  padding: 10px 20px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.adash-primary:hover:not(:disabled) { background: var(--accent-hover); transform: scale(1.02); }
+.adash-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.adash-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 600; font-size: 13px;
+  padding: 10px 20px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--dur-fast) var(--ease);
+}
+.adash-secondary:hover { background: var(--surface-2); }
+
+.adash-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-3);
+  margin-bottom: var(--s-8);
+}
+.adash-stat {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-4);
+  background: var(--surface-2);
+  border-radius: var(--r-md);
+}
+.adash-stat > svg { color: var(--accent); flex-shrink: 0; }
+.adash-stat > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.adash-stat-value { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+.adash-stat-label {
+  font-size: 11px; color: var(--text-sub);
+  text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;
+}
+
+.adash-section { margin-bottom: var(--s-8); }
+.adash-section h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 var(--s-4); }
+
+.adash-empty-inline {
+  padding: var(--s-6);
+  background: var(--surface-2);
+  border-radius: var(--r-md);
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  gap: var(--s-3);
+}
+.adash-empty-inline p { color: var(--text-sub); font-size: 14px; margin: 0; }
+
+.adash-hint { color: var(--text-sub); font-size: 13px; }
+
+.adash-track-actions { display: flex; align-items: center; gap: var(--s-4); margin-bottom: var(--s-4); }
+.adash-play-all {
+  width: 48px; height: 48px;
+  border-radius: var(--r-pill);
+  background: var(--accent); color: #000;
+  border: none;
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease);
+}
+.adash-play-all:hover { transform: scale(1.05); }
+.adash-track-count { font-size: 13px; color: var(--text-sub); }
+
+.adash-track-wrap {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+.adash-delete { color: var(--text-muted); margin-right: 6px; }
+.adash-delete:hover { color: #ff8b8b; background: rgba(255,107,107,0.1); }
+
+.adash-album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--s-4);
+}
+.adash-album-card { display: flex; flex-direction: column; gap: 8px; }
+.adash-album-cover {
+  aspect-ratio: 1/1;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--surface-2);
+  color: var(--text-sub);
+  display: grid; place-items: center;
+}
+.adash-album-cover img { width: 100%; height: 100%; object-fit: cover; }
+.adash-album-name { font-size: 13px; font-weight: 600; }
+.adash-album-count { font-size: 11px; color: var(--text-sub); }
+
+/* ---------- Contact admin modal ---------- */
+.adash-modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(6px);
+  z-index: 250;
+  display: grid; place-items: center;
+  padding: 20px;
+}
+.adash-modal {
+  width: 100%; max-width: 560px;
+  max-height: 88vh;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.adash-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--border-soft);
+}
+.adash-modal-header h3 { margin: 0; font-size: 16px; font-weight: 700; }
+
+.adash-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--s-5);
+}
+
+.adash-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+.adash-contact-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.adash-contact-form label > span {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-sub);
+}
+.adash-contact-form input,
+.adash-contact-form textarea {
+  background: var(--surface-3);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+}
+.adash-contact-form input:focus,
+.adash-contact-form textarea:focus { border-color: var(--accent); }
+
+.adash-modal-error {
+  color: #ff8b8b;
+  font-size: 12px;
+  margin: 0;
+  padding: 8px 12px;
+  background: rgba(255,107,107,0.1);
+  border-radius: var(--r-sm);
+}
+.adash-modal-success {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-size: 12px;
+  margin: 0;
+  padding: 8px 12px;
+  background: var(--accent-soft);
+  border-radius: var(--r-sm);
+}
+
+.adash-contact-history {
+  margin-top: var(--s-6);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--border-soft);
+}
+.adash-contact-history h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-sub);
+  margin: 0 0 var(--s-3);
+}
+.adash-contact-history ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.adash-contact-history li {
+  padding: 10px 12px;
+  background: var(--surface-3);
+  border-radius: var(--r-sm);
+}
+.adash-contact-history-title {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--s-2);
+  margin-bottom: 2px;
+}
+.adash-contact-history-title strong { font-size: 13px; }
+.adash-contact-history-sub {
+  font-size: 11px;
+  color: var(--text-sub);
+}
+.adash-status-pill {
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.adash-status-pill.open {
+  background: rgba(255,200,80,0.15);
+  color: #ffc850;
+}
+.adash-status-pill.resolved {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .adash-stats { grid-template-columns: repeat(2, 1fr); }
+  .adash-header h1 { font-size: 26px; }
+  .adash-header-actions { width: 100%; }
+  .adash-primary, .adash-secondary { flex: 1; justify-content: center; }
+}

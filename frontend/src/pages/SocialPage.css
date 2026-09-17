@@ -1,0 +1,95 @@
+/* frontend/src/pages/SocialPage.css */
+.sp { padding-bottom: var(--s-8); max-width: 720px; }
+
+.sp-header {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-6) 0 var(--s-4);
+}
+.sp-header h1 {
+  font-size: 26px; font-weight: 800;
+  letter-spacing: -0.02em; margin: 0;
+}
+
+.sp-tabs {
+  display: flex; gap: var(--s-2);
+  border-bottom: 1px solid var(--border-soft);
+  margin-bottom: var(--s-5);
+}
+.sp-tabs button {
+  background: none; border: none;
+  color: var(--text-sub);
+  font-size: 13px; font-weight: 600;
+  padding: 12px 14px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+}
+.sp-tabs button.active {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+.sp-loading {
+  display: flex; align-items: center; gap: var(--s-3);
+  color: var(--text-sub); font-size: 13px;
+  padding: var(--s-6) 0;
+}
+.sp-spin { animation: sp-spin 0.9s linear infinite; }
+@keyframes sp-spin { to { transform: rotate(360deg); } }
+
+.sp-error {
+  color: #ff8b8b;
+  font-size: 13px;
+  padding: var(--s-5) 0;
+}
+
+.sp-empty {
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  gap: var(--s-3);
+  padding: var(--s-10) var(--s-4);
+}
+.sp-empty-art {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-dim);
+  display: grid; place-items: center;
+  margin-bottom: var(--s-2);
+}
+.sp-empty h2 { margin: 0; font-size: 18px; }
+.sp-empty p { margin: 0; color: var(--text-sub); font-size: 13px; max-width: 340px; }
+
+.sp-list { display: flex; flex-direction: column; gap: 2px; list-style: none; padding: 0; margin: 0; }
+.sp-user-item { margin: 0; }
+
+.sp-user {
+  display: flex; align-items: center; gap: var(--s-3);
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  border: none;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--dur-fast) var(--ease);
+}
+.sp-user:hover { background: var(--surface-2); }
+.sp-user:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.sp-user-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #450af5, #8e8ee5);
+  color: #fff; font-size: 14px; font-weight: 700;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.sp-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.sp-user-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.sp-user-name { font-size: 14px; font-weight: 600; }
+.sp-user-handle { font-size: 12px; color: var(--text-sub); }

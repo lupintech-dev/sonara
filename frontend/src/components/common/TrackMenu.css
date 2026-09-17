@@ -1,0 +1,65 @@
+/* frontend/src/components/common/TrackMenu.css */
+.track-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+.track-menu-trigger {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+.track-row:hover .track-menu-trigger,
+.queue-item:hover .track-menu-trigger,
+.track-menu-trigger:focus-visible {
+  opacity: 1;
+}
+
+.track-menu-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 60;
+  min-width: 260px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  animation: tm-pop var(--dur-fast) var(--ease);
+}
+@keyframes tm-pop {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.track-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: 9px 12px;
+  border-radius: var(--r-sm);
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease);
+}
+.track-menu-item:hover:not(:disabled) { background: var(--surface-hi); }
+.track-menu-item:disabled { opacity: 0.6; cursor: default; }
+.track-menu-item svg { color: var(--text-sub); flex-shrink: 0; }
+
+.track-menu-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 6px;
+}
+
+.track-menu-spin {
+  animation: tm-spin 0.9s linear infinite;
+}
+@keyframes tm-spin { to { transform: rotate(360deg); } }

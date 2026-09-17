@@ -1,0 +1,90 @@
+/* frontend/src/pages/ArtistAlbumsPage.css */
+.aap { padding-bottom: var(--s-10); }
+
+.aap-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  min-height: 400px;
+  color: var(--text-sub);
+  font-size: 14px;
+  flex-direction: column;
+}
+.aap-spin { animation: aap-spin 0.9s linear infinite; }
+@keyframes aap-spin { to { transform: rotate(360deg); } }
+
+.aap-header {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-4);
+  padding: var(--s-6) 0 var(--s-5);
+}
+.aap-header-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.aap-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-sub);
+  font-weight: 700;
+}
+.aap-header h1 {
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin: 0;
+  line-height: 1;
+}
+.aap-meta {
+  font-size: 13px;
+  color: var(--text-sub);
+  margin: 4px 0 0;
+}
+
+.aap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--s-4);
+}
+.aap-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: var(--surface-2);
+  border: none;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.aap-card:hover {
+  background: var(--surface-3);
+  transform: translateY(-2px);
+}
+.aap-cover {
+  aspect-ratio: 1/1;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--surface-3), var(--surface-hi));
+  color: var(--text-sub);
+  display: grid; place-items: center;
+}
+.aap-cover img { width: 100%; height: 100%; object-fit: cover; }
+.aap-card-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.aap-card-name { font-size: 14px; font-weight: 600; }
+.aap-card-count { font-size: 11px; color: var(--text-sub); }
+
+.aap-empty {
+  padding: var(--s-10) var(--s-4);
+  text-align: center;
+  color: var(--text-sub);
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .aap-header { flex-direction: column; align-items: flex-start; gap: var(--s-3); }
+  .aap-header h1 { font-size: 26px; }
+  .aap-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}

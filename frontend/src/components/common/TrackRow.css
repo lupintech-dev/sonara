@@ -1,0 +1,95 @@
+/* frontend/src/components/common/TrackRow.css */
+.track-row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto auto;
+  align-items: center;
+  gap: var(--s-3);
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: var(--text);
+  border-radius: var(--r-md);
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease);
+}
+.track-row:hover { background: var(--surface-2); }
+.track-row.current .track-title { color: var(--accent); }
+
+/* With plays column */
+.track-row.has-plays {
+  grid-template-columns: 48px 1fr auto auto auto;
+}
+
+/* With left index (used on artist pages) */
+.track-row.has-index {
+  grid-template-columns: 24px 48px 1fr auto auto;
+}
+.track-row.has-index.has-plays {
+  grid-template-columns: 24px 48px 1fr auto auto auto;
+}
+
+.track-index {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.track-cover {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--surface-3);
+  flex-shrink: 0;
+}
+.track-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+.track-cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  color: #000;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+.track-row:hover .track-cover-overlay { opacity: 1; }
+
+.track-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+.track-title { font-size: 14px; font-weight: 500; }
+.track-artist { font-size: 12px; color: var(--text-sub); }
+
+.track-plays {
+  font-size: 12px;
+  color: var(--text-sub);
+  font-variant-numeric: tabular-nums;
+  min-width: 44px;
+  text-align: right;
+  padding-right: var(--s-3);
+}
+
+.track-duration {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 768px) {
+  .track-row { gap: var(--s-2); padding: 6px 8px; }
+  .track-row.has-plays { grid-template-columns: 40px 1fr auto auto auto; }
+  .track-row.has-index { grid-template-columns: 20px 40px 1fr auto auto; }
+  .track-row.has-index.has-plays { grid-template-columns: 20px 40px 1fr auto auto auto; }
+  .track-plays { min-width: 32px; padding-right: var(--s-2); font-size: 11px; }
+  .track-index { font-size: 11px; }
+}

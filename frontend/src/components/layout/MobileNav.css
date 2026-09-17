@@ -1,0 +1,45 @@
+/* frontend/src/components/layout/MobileNav.css */
+.mobile-nav { display: none; }
+
+@media (max-width: 768px) {
+  .mobile-nav {
+    display: grid;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    height: var(--mobilenav-h);
+    grid-template-columns: repeat(5, 1fr);
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(20px) saturate(1.6);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    border-top: 1px solid var(--border-soft);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  :root[data-theme="light"] .mobile-nav {
+    background: rgba(247, 247, 247, 0.88);
+  }
+
+  .mnav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 2px;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 500;
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .mnav-item.active { color: var(--text); }
+  .mnav-item span { font-size: 9px; }
+
+  /* Accent icons */
+  .mnav-item-ai svg { color: var(--accent); }
+  .mnav-item-radio svg { color: #ff3b30; }
+  .mnav-item-ai.active,
+  .mnav-item-radio.active { color: var(--text); }
+}

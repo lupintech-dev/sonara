@@ -1,0 +1,76 @@
+/* frontend/src/pages/ArtistTracksPage.css */
+.atp { padding-bottom: var(--s-10); }
+
+.atp-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  min-height: 400px;
+  color: var(--text-sub);
+  font-size: 14px;
+  flex-direction: column;
+}
+.atp-spin { animation: atp-spin 0.9s linear infinite; }
+@keyframes atp-spin { to { transform: rotate(360deg); } }
+
+.atp-header {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-4);
+  padding: var(--s-6) 0 var(--s-5);
+}
+.atp-header-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.atp-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-sub);
+  font-weight: 700;
+}
+.atp-header h1 {
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin: 0;
+  line-height: 1;
+}
+.atp-meta {
+  font-size: 13px;
+  color: var(--text-sub);
+  margin: 4px 0 0;
+}
+
+.atp-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-2) 0 var(--s-4);
+}
+.atp-play-all {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease);
+}
+.atp-play-all:hover { transform: scale(1.05); }
+.atp-count {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.atp-empty {
+  padding: var(--s-10) var(--s-4);
+  text-align: center;
+  color: var(--text-sub);
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .atp-header { flex-direction: column; align-items: flex-start; gap: var(--s-3); }
+  .atp-header h1 { font-size: 26px; }
+}

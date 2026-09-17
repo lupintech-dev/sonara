@@ -1,0 +1,147 @@
+/* frontend/src/components/common/FolderCard.css */
+.folder-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: var(--surface-2);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+  text-align: left;
+  color: var(--text);
+}
+
+.folder-card:hover {
+  background: var(--surface-3);
+  transform: translateY(-2px);
+}
+
+.folder-card-cover {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--r-sm);
+  background: linear-gradient(135deg, var(--surface-3), var(--surface-hi));
+  color: var(--text-sub);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+}
+
+.folder-card-mosaic {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  width: 100%;
+  height: 100%;
+  gap: 1px;
+  background: var(--bg);
+}
+.folder-card-mosaic > span {
+  background-size: cover;
+  background-position: center;
+  background-color: var(--surface-3);
+}
+.folder-card-mosaic-empty {
+  background: linear-gradient(135deg, var(--surface-3), var(--surface-hi));
+}
+
+.folder-card-single {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.folder-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.folder-card-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.folder-card-icon { color: var(--accent); flex-shrink: 0; }
+.folder-card-name {
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 0;
+}
+.folder-card-count {
+  font-size: 11px;
+  color: var(--text-sub);
+  padding-left: 20px;
+}
+
+.folder-card-menu-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.55);
+  border: none;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+  z-index: 2;
+}
+.folder-card:hover .folder-card-menu-btn { opacity: 1; }
+.folder-card-menu-btn:hover { background: rgba(0,0,0,0.75); }
+
+.folder-card-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+.folder-card-menu {
+  position: absolute;
+  top: 40px;
+  right: 8px;
+  z-index: 50;
+  min-width: 160px;
+  padding: 6px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.folder-card-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+.folder-card-menu button:hover { background: var(--surface-hi); }
+.folder-card-menu button svg { color: var(--text-sub); }
+.folder-card-menu button.danger { color: #ff8b8b; }
+.folder-card-menu button.danger svg { color: #ff8b8b; }
+.folder-card-menu button.danger:hover { background: rgba(255,107,107,0.1); }
+
+/* Touch devices: menu button is always visible */
+@media (max-width: 768px), (hover: none) {
+  .folder-card-menu-btn { opacity: 1; }
+}

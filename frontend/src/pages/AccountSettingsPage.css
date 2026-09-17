@@ -1,0 +1,175 @@
+/* frontend/src/pages/AccountSettingsPage.css */
+.asp { padding-bottom: var(--s-8); max-width: 640px; }
+
+.asp-header {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-6) 0 var(--s-4);
+}
+.asp-header h1 {
+  font-size: 28px; font-weight: 800;
+  letter-spacing: -0.02em; margin: 0;
+}
+
+.asp-card {
+  background: var(--surface-2);
+  border-radius: var(--r-md);
+  padding: var(--s-5);
+  margin-bottom: var(--s-5);
+}
+.asp-avatar-wrap {
+  display: flex; align-items: center; gap: var(--s-5);
+}
+.asp-avatar {
+  position: relative;
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #450af5, #8e8ee5);
+  color: #fff;
+  font-size: 36px; font-weight: 800;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.asp-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.asp-avatar-busy {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: grid; place-items: center;
+  color: #fff;
+}
+.asp-avatar-actions { display: flex; flex-direction: column; gap: 8px; }
+.asp-avatar-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: var(--r-pill);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease);
+}
+.asp-avatar-btn:hover:not(:disabled) { background: var(--surface-hi); }
+.asp-avatar-btn.primary {
+  background: var(--accent); color: #000;
+  border-color: transparent;
+}
+.asp-avatar-btn.primary:hover:not(:disabled) { background: var(--accent-hover); }
+.asp-avatar-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.asp-handle-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: var(--s-4);
+}
+.asp-handle {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin: 0;
+}
+.asp-handle-email { color: var(--text-muted); }
+
+.asp-form {
+  background: var(--surface-2);
+  border-radius: var(--r-md);
+  padding: var(--s-5);
+  display: flex; flex-direction: column;
+  gap: var(--s-4);
+}
+.asp-field { display: flex; flex-direction: column; gap: 6px; }
+.asp-field > span {
+  font-size: 12px; font-weight: 600;
+  color: var(--text-sub);
+}
+.asp-field input,
+.asp-field textarea {
+  background: var(--surface-3);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-sm);
+  padding: 11px 13px;
+  color: var(--text);
+  font-size: 14px; font-family: inherit;
+  outline: none; resize: vertical;
+}
+.asp-field input:focus,
+.asp-field textarea:focus { border-color: var(--accent); }
+.asp-field small { font-size: 11px; color: var(--text-muted); }
+
+.asp-error {
+  margin: 0;
+  color: #ff8b8b; font-size: 12px;
+  padding: 8px 12px;
+  background: rgba(255,107,107,0.1);
+  border-radius: var(--r-sm);
+}
+
+.asp-actions {
+  display: flex; align-items: center; gap: var(--s-4);
+}
+.asp-save {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: #000;
+  border: none; font-weight: 700; font-size: 14px;
+  padding: 11px 22px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.asp-save:hover:not(:disabled) { background: var(--accent-hover); transform: scale(1.02); }
+.asp-save:disabled { opacity: 0.5; cursor: not-allowed; }
+.asp-saved { color: var(--accent); font-size: 13px; font-weight: 600; }
+
+/* Picker */
+.asp-picker-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(4px);
+  z-index: 250;
+  display: grid; place-items: center;
+  padding: 20px;
+}
+.asp-picker {
+  width: 100%; max-width: 440px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s-5);
+}
+.asp-picker-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--s-4);
+}
+.asp-picker-header h3 { margin: 0; font-size: 16px; font-weight: 700; }
+.asp-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+.asp-preset {
+  position: relative;
+  aspect-ratio: 1/1;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  padding: 0; background: none; cursor: pointer;
+  overflow: hidden;
+  transition: border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.asp-preset img { width: 100%; height: 100%; object-fit: cover; }
+.asp-preset:hover { transform: scale(1.08); }
+.asp-preset.active { border-color: var(--accent); }
+.asp-preset-check {
+  position: absolute; bottom: 2px; right: 2px;
+  width: 18px; height: 18px;
+  border-radius: 50%; background: var(--accent); color: #000;
+  display: grid; place-items: center;
+}
+.asp-spin { animation: asp-spin 0.9s linear infinite; }
+@keyframes asp-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 768px) {
+  .asp-avatar-wrap { flex-direction: column; align-items: flex-start; }
+  .asp-avatar-actions { width: 100%; }
+  .asp-avatar-btn { width: 100%; justify-content: center; }
+  .asp-picker-grid { grid-template-columns: repeat(4, 1fr); }
+}
